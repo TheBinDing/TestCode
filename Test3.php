@@ -65,24 +65,28 @@
                     <li class="" id="tab2"><a data-toggle="tab" href="#" onclick="tpoly.employee.setStatus('O');">ออก</a></li>
                     <li class="" id="tab3"><a data-toggle="tab" href="#" onclick="tpoly.employee.setStatus('B');">Blacklist</a></li>
                 </ul>
-                <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
-                    <div class="col-sm-6">
-                        <div class="dataTables_length">
-                            <label>
-                                <select id="employeePage" style="display: inline-block;width: auto;height: 30px;vertical-align: middle;" onChange="tpoly.employee.page(this);">
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="30">30</option>
-                                </select>
-                                จำนวนแสดงต่อหน้า
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="dataTables_filter">
-                            <label>ค้นหา : 
-                                <input type="search" class="form-control input-sm" style="display: inline-block;width: auto;vertical-align: middle;" id="peopleEmployee" placeholder="ค้าหาพนักงาน" onChange="tpoly.employee.setSearch(this);">
-                            </label>
+                <div class="tab-content">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="dataTables_length">
+                                    <label>
+                                        <select id="employeePage" style="display: inline-block;width: auto;height: 30px;vertical-align: middle;" onChange="tpoly.employee.page(this);">
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                        </select>
+                                        จำนวนแสดงต่อหน้า
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="dataTables_filter">
+                                    <label>ค้นหา : 
+                                        <input type="search" class="form-control input-sm" style="display: inline-block;width: auto;vertical-align: middle;" id="peopleEmployee" placeholder="ค้าหาพนักงาน" onChange="tpoly.employee.setSearch(this);">
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
