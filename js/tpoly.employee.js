@@ -20,19 +20,95 @@ var tpoly = {
 
     tpoly.employee.page = function(page) {
         p = $('#employeePage').val();
-        tpoly.employee.loadEmployee('',p);
+
+        id1 = $("#tab1").attr("class");
+        id2 = $("#tab2").attr("class");
+        id3 = $("#tab3").attr("class");
+
+        if(id1 == 'active'){
+            status = 'W';
+        }
+        if(id2 == 'active'){
+            status = 'O';
+        }
+        if(id3 == 'active'){
+            status = 'B';
+        }
+
+        tpoly.employee.loadEmployee('',p,status);
     }
 
-    tpoly.employee.loadEmployee = function(obj, page) {
+    tpoly.employee.setStatus = function(status) {
+        if(status == 'W') {
+            $('#employeePage').val(10);
+        }
+        if(status == 'O') {
+            $('#employeePage').val(10);
+        }
+        if(status == 'B') {
+            $('#employeePage').val(10);
+        }
+
+        tpoly.employee.loadEmployee('', 10, status);
+    }
+
+    tpoly.employee.setSearch = function(obj) {
         vv = $(obj).val();
+
+        p = $('#employeePage').val();
+
+        id1 = $("#tab1").attr("class");
+        id2 = $("#tab2").attr("class");
+        id3 = $("#tab3").attr("class");
+
+        if(id1 == 'active'){
+            status = 'W';
+        }
+        if(id2 == 'active'){
+            status = 'O';
+        }
+        if(id3 == 'active'){
+            status = 'B';
+        }
+
+        tpoly.employee.loadEmployee(vv, p, status);
+    }
+
+    tpoly.employee.setPageSline = function(value) {
+
+        p = $('#employeePage').val();
+
+        id1 = $("#tab1").attr("class");
+        id2 = $("#tab2").attr("class");
+        id3 = $("#tab3").attr("class");
+
+        if(id1 == 'active'){
+            status = 'W';
+        }
+        if(id2 == 'active'){
+            status = 'O';
+        }
+        if(id3 == 'active'){
+            status = 'B';
+        }
+
+        tpoly.employee.loadEmployee('', p, status, value);
+    }
+
+    tpoly.employee.loadEmployee = function(obj, page, status, value) {
+        vv = obj;
         tpoly.employee.Criteria['name'] = '';
         tpoly.employee.Criteria['id'] = '';
+
+        if(status == undefined) {
+            status = 'W';
+        }
 
         if(page == undefined || page == '') {
             page = $('#employeePage').val();
         }
 
-        if(vv != undefined || vv == '') {
+        if(vv != undefined || vv != '') {
             if(isNaN(vv)) {
                 tpoly.employee.Criteria['name'] = vv;
             } else {
@@ -43,6 +119,9 @@ var tpoly = {
 
         tpoly.employee.Criteria['mode'] = 'loadTest';
         tpoly.employee.Criteria['page'] = page;
+        tpoly.employee.Criteria['status'] = status;
+        tpoly.employee.Criteria['site'] = '';
+        tpoly.employee.Criteria['num'] = value;
         
         var ajax_config = {
             url: "AjaxSearch.php",
@@ -86,6 +165,11 @@ var tpoly = {
                 html += '</td>';
                 html += '</tr>';
             }
+            if(resultSearch == '') {
+                html += '<tr>';
+                html += '<td colspan="6" style="text-align: center;">Data Not Found</td>';
+                html += '</tr>';
+            }
             html += '</tbody>';
             html += '</table>';
 
@@ -102,39 +186,264 @@ var tpoly = {
             dataType: "json",
             type: "POST",
             data: tpoly.employee.Criteria,
-            // beforeSend: function() {
-            //     tpoly.popup('loading');
-            // }
+            beforeSend: function() {
+                tpoly.popup('loading');
+            }
         };
 
         var get_ajax = $.ajax(ajax_config);
         get_ajax.done(function(response) {
             tpoly.num = response;
             resultNum = tpoly.num;
-            end = tpoly.employee.Criteria['page'];
-            start = (end - (end - 1));
+
+            num = tpoly.employee.Criteria['num'];
+            limitP = tpoly.employee.Criteria['page'];
+
+            start = (num > 1) ? (((num - 1) * limitP) + 1) : 1;
+            end = (num > 1) ? (limitP * num) : limitP;
+
             var ListPage = $('#ListPage');
+            var p = 1;
+            var s = 1;
+
+            totalPage = Math.ceil(resultNum / limitP);
+
+            if(num == undefined) {
+                num = 1;
+            }
 
             var html = '';
             html += '<br>';
             html += '<span>ข้อมูลจาก '+ start +' ถึง '+ end +' จากทั้งหมด '+ resultNum +' รายการ</span>';
             html += '<div class="dataTables_paginate paging_simple_numbers">';
             html += '<ul class="pagination">';
-            html += '<li id="employsearch-page-pre" class="paginate_button previous disabled">';
-            html += '<a href="#">Previous</a>';
-            html += '</li>';
-            html += '<li class="paginate_button">';
-            html += '<a href="#">1</a>';
-            html += '</li>';
-            html += '<li class="paginate_button">';
-            html += '<a href="#">2</a>';
-            html += '</li>';
-            html += '<li class="paginate_button">';
-            html += '<a href="#">3</a>';
-            html += '</li>';
-            html += '<li id="employsearch-page-next" class="paginate_button next disabled">';
-            html += '<a href="#">Next</a>';
-            html += '</li>';
+            if(totalPage <= 10) {
+                if(num > 1) {
+                    html += '<li id="employsearch-page-pre" class="paginate_button previous" onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                } else {
+                    html += '<li id="employsearch-page-pre" class="paginate_button previous disabled" onClick="tpoly.employee.setPageSline();">';
+                }
+                html += '<a href="#">Previous</a>';
+                html += '</li>';
+                for(p;p<=totalPage;p++){
+                    if(p == num) {
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+p+');">';
+                    } else {
+                        html += '<li class="paginate_button" onClick="tpoly.employee.setPageSline('+p+');">';
+                    }
+                    html += '<a href="#">'+ p +'</a>';
+                    html += '</li>';
+                }
+                if(num < (p-1)) {
+                    html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                } else {
+                    html += '<li id="employsearch-page-next" class="paginate_button next disabled">';
+                }
+                html += '<a href="#">Next</a>';
+                html += '</li>';
+            } else {
+                if(num > 1) {
+                    html += '<li id="employsearch-page-pre" class="paginate_button previous" onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                } else {
+                    html += '<li id="employsearch-page-pre" class="paginate_button previous disabled">';
+                }
+                html += '<a href="#">Previous</a>';
+                html += '</li>';
+                if(num < 5) {
+                    for(s;s<=5;s++) {
+                        if(s == num) {
+                            html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+s+');">';
+                        } else {
+                            html += '<li class="paginate_button" onClick="tpoly.employee.setPageSline('+s+');">';
+                        }
+                        html += '<a href="#">'+ s +'</a>';
+                        html += '</li>';
+                    }
+                    html += '<li class="paginate_button disabled">';
+                    html += '<a href="#">...</a>';
+                    html += '</li>';
+                    html += '<li class="paginate_button" onClick="tpoly.employee.setPageSline('+totalPage+');">';
+                    html += '<a href="#">'+totalPage+'</a>';
+                    html += '</li>';
+                    html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                    html += '<a href="#">Next</a>';
+                    html += '</li>';
+                }
+                if(num >= 5 && num <= (totalPage - 5)) {
+                    html += '<li class="paginate_button" onClick="tpoly.employee.setPageSline(1);">';
+                    html += '<a href="#">1</a>';
+                    html += '</li>';
+                    html += '<li class="paginate_button disabled" onClick="tpoly.employee.setPageSline('+s+');">';
+                    html += '<a href="#">...</a>';
+                    html += '</li>';
+
+                    html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                    html += '<a href="#">'+(num-1)+'</a>';
+                    html += '</li>';
+                    html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+(num)+');">';
+                    html += '<a href="#">'+(num)+'</a>';
+                    html += '</li>';
+                    html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                    html += '<a href="#">'+(num+1)+'</a>';
+                    html += '</li>';
+
+                    html += '<li class="paginate_button disabled" onClick="tpoly.employee.setPageSline('+s+');">';
+                    html += '<a href="#">...</a>';
+                    html += '</li>';
+                    html += '<li class="paginate_button" onClick="tpoly.employee.setPageSline('+totalPage+');">';
+                    html += '<a href="#">'+totalPage+'</a>';
+                    html += '</li>';
+                    html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                    html += '<a href="#">Next</a>';
+                    html += '</li>';
+                }
+                if(num > (totalPage - 5)) {
+                    html += '<li class="paginate_button" onClick="tpoly.employee.setPageSline(1);">';
+                    html += '<a href="#">1</a>';
+                    html += '</li>';
+                    html += '<li class="paginate_button disabled" onClick="tpoly.employee.setPageSline('+s+');">';
+                    html += '<a href="#">...</a>';
+                    html += '</li>';
+                    if(num == (totalPage - 5)) {
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+num+');">';
+                        html += '<a href="#">'+num+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">'+(num+1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+2)+');">';
+                        html += '<a href="#">'+(num+2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+3)+');">';
+                        html += '<a href="#">'+(num+3)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+4)+');">';
+                        html += '<a href="#">'+(num+4)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+5)+');">';
+                        html += '<a href="#">'+(num+5)+'</a>';
+                        html += '</li>';
+                        html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">Next</a>';
+                        html += '</li>';
+                    }
+                    if(num == (totalPage - 4)) {
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                        html += '<a href="#">'+(num-1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+num+');">';
+                        html += '<a href="#">'+num+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">'+(num+1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+2)+');">';
+                        html += '<a href="#">'+(num+2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+3)+');">';
+                        html += '<a href="#">'+(num+3)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+4)+');">';
+                        html += '<a href="#">'+(num+4)+'</a>';
+                        html += '</li>';
+                        html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">Next</a>';
+                        html += '</li>';
+                    }
+                    if(num == (totalPage - 3)) {
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-2)+');">';
+                        html += '<a href="#">'+(num-2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                        html += '<a href="#">'+(num-1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+num+');">';
+                        html += '<a href="#">'+num+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">'+(num+1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+2)+');">';
+                        html += '<a href="#">'+(num+2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+3)+');">';
+                        html += '<a href="#">'+(num+3)+'</a>';
+                        html += '</li>';
+                        html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">Next</a>';
+                        html += '</li>';
+                    }
+                    if(num == (totalPage - 2)) {
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-3)+');">';
+                        html += '<a href="#">'+(num-3)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-2)+');">';
+                        html += '<a href="#">'+(num-2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                        html += '<a href="#">'+(num-1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+num+');">';
+                        html += '<a href="#">'+num+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">'+(num+1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+2)+');">';
+                        html += '<a href="#">'+(num+2)+'</a>';
+                        html += '</li>';
+                        html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">Next</a>';
+                        html += '</li>';
+                    }
+                    if(num == (totalPage - 1)) {
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-4)+');">';
+                        html += '<a href="#">'+(num-4)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-3)+');">';
+                        html += '<a href="#">'+(num-3)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-2)+');">';
+                        html += '<a href="#">'+(num-2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                        html += '<a href="#">'+(num-1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+num+');">';
+                        html += '<a href="#">'+num+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">'+(num+1)+'</a>';
+                        html += '</li>';
+                        html += '<li id="employsearch-page-next" class="paginate_button next" onClick="tpoly.employee.setPageSline('+(num+1)+');">';
+                        html += '<a href="#">Next</a>';
+                        html += '</li>';
+                    }
+                    if(num == totalPage) {
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-5)+');">';
+                        html += '<a href="#">'+(num-5)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-4)+');">';
+                        html += '<a href="#">'+(num-4)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-3)+');">';
+                        html += '<a href="#">'+(num-3)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-2)+');">';
+                        html += '<a href="#">'+(num-2)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button " onClick="tpoly.employee.setPageSline('+(num-1)+');">';
+                        html += '<a href="#">'+(num-1)+'</a>';
+                        html += '</li>';
+                        html += '<li class="paginate_button active" onClick="tpoly.employee.setPageSline('+num+');">';
+                        html += '<a href="#">'+num+'</a>';
+                        html += '</li>';
+                        html += '<li id="employsearch-page-next" class="paginate_button next disabled">';
+                        html += '<a href="#">Next</a>';
+                        html += '</li>';
+                    }
+                }
+            }
             html += '</ul>';
             html += '</div>';
 
@@ -143,151 +452,21 @@ var tpoly = {
         });
     }
 
-    // tpoly.selectEmployee = function(vars) {
-    //     tpoly.employee.Criteria['mode'] = 'load_employee_ae';
-    //     tpoly.employee.Criteria['code'] = vars;
-    //     var ajax_config = {
-    //         url: "func/AjaxSearch.php",
-    //         dataType: "json",
-    //         type: "POST",
-    //         data: tpoly.employee.Criteria,
-    //     };
-
-    //     var get_ajax = $.ajax(ajax_config);
-    //     get_ajax.done(function(response) {
-    //         EmList = response;
-    //         tpoly.setEm(0);
-    //     });
-    // }
-
-    // tpoly.setEm = function(key) {
-    //     result = EmList;
-
-    //     var permiss = tpoly.employee.Criteria['rule'];
-
-    //     $('#Em_IDs').val(result[0]['IDs']);
-
-    //     if(result[0]['Titel'] == 'Mr') {
-    //         Titel = 'นาย ';
-    //     }
-    //     if(result[0]['Titel'] == 'Ms') {
-    //         Titel = 'นางสาว ';
-    //     }
-    //     if(result[0]['Titel'] == 'Mrs') {
-    //         Titel = 'นาง ';
-    //     }
-
-    //     if(result[0]['DayCost'] == 'Month') {
-    //         Cost = 'รายเดือน';
-    //     }
-    //     if(result[0]['DayCost'] == 'Day') {
-    //         Cost = 'รายวัน';
-    //     }
-
-    //     if(result[0]['ChoiceBank'] == 'C') {
-    //         Choice = 'รับเงินสด';
-    //         $('#BankD').css('display', 'none');
-    //     }
-    //     if(result[0]['ChoiceBank'] == 'B') {
-    //         Choice = 'โอนเข้าธนาคาร';
-    //     }
-    //     if(result[0]['Soice'] == 1) {
-    //         social = 'คิด'
-    //     }
-    //     if(result[0]['Soice'] == 0) {
-    //         social = 'ไม่คิด'
-    //     }
-    //     if(result[0]['LivingExpenses'] == 0) {
-    //         $('#LivingExpenses').css('display', 'none');
-    //     }
-    //     if(result[0]['Allowance'] == 0) {
-    //         $('#Allowance').css('display', 'none');
-    //     }
-    //     if(result[0]['AllowanceDisaster'] == 0) {
-    //         $('#AllowanceDisaster').css('display', 'none');
-    //     }
-    //     if(result[0]['AllowanceSafety'] == 0) {
-    //         $('#AllowanceSafety').css('display', 'none');
-    //     }
-    //     if(result[0]['SpecialAllowance'] == 0) {
-    //         $('#SpecialAllowance').css('display', 'none');
-    //     }
-    //     if((result[0]['LivingExpenses'] == 0) && (result[0]['Allowance'] == 0)) {
-    //         $('#All01').css('display', 'none');
-    //     }
-    //     if((result[0]['AllowanceDisaster'] == 0) && (result[0]['AllowanceSafety'] == 0) && (result[0]['SpecialAllowance'] == 0)) {
-    //         $('#All02').css('display', 'none');
-    //     }
-    //     if(result[0]['Status'] == 'B' && permiss == '3') {
-    //         $('#buttons').css('display', 'none');
-    //     } else {
-    //         $('#buttons').css('display', '');
-    //     }
-
-    //     aDateOpen = result[0]['DateOpen'];
-    //     spTodayA = aDateOpen.split(' ');
-    //     todaya = spTodayA[0] + ' ' + spTodayA[1] + ' ' + spTodayA[2];
-    //     dateTodayA = formatDate(todaya);
-    //     bDateBirthDay = result[0]['DateBirthDay'];
-    //     spTodayB = bDateBirthDay.split(' ');
-    //     todayb = spTodayB[0] + ' ' + spTodayB[1] + ' ' + spTodayB[2];
-    //     dateTodayB = formatDate(todayb);
-
-    //     tests = Date();
-    //     testsD = tests.split(' ');
-
-    //     Daied = (testsD[3] - spTodayB[2]);
-
-    //     dWork = formatDateSeach(todaya);
-    //     var res = dWork.split("-");
-    //     var d = res[0] + '/' + res[1] + '/' + res[2];
-    //     var c = age(new Date(d));
-    //     var c = c.toString();
-    //     var f = c.split("-");
-
-    //     if(result[0]['Pic'] != '') {
-    //         document.getElementById('myImage').src = 'func/EmployeePicture/' + result[0]['Pic'];
-    //     }
-    //     if(result[0]['Pic'] == '') {
-    //         document.getElementById('myImage').src = 'img/Login.png';
-    //     }
-    //     document.getElementById("Cards").innerHTML = 'เลขบัตรประชาชน : '+result[0]['Cards'];
-    //     document.getElementById("IDs").innerHTML = 'รหัสพนักงาน : '+result[0]['IDs'];
-    //     document.getElementById("Name").innerHTML = 'ชื่อ - นามสกุล : '+Titel+' '+result[0]['Fullname']+' '+result[0]['Lastname'];
-    //     document.getElementById("DateBirthDay").innerHTML = 'วัน/เดือน/ปี เกิด : '+ dateTodayB;
-    //     document.getElementById("Age").innerHTML = 'อายุ : '+ Daied + ' ปี';
-    //     document.getElementById("Address").innerHTML = 'ที่อยู่ : '+result[0]['Address'];
-    //     document.getElementById("DateOpen").innerHTML = 'วันที่เข้าทำงาน : '+dateTodayA;
-    //     document.getElementById("DateOpen2").innerHTML = f[0]+' ปี '+f[1]+' เดือน '+f[2]+' วัน';
-    //     document.getElementById("Site").innerHTML = 'โครงการ : '+result[0]['Site_Name'];
-    //     document.getElementById("Position").innerHTML = 'ตำแหน่ง : '+result[0]['Pos_Name'];
-    //     document.getElementById("Group").innerHTML = 'ชุด/สังกัด : '+result[0]['Group_Name'];
-    //     document.getElementById("Personal").innerHTML = 'พนักงาน : '+ Cost;
-    //     document.getElementById("Personal2").innerHTML = 'ค่าแรง : '+result[0]['Money']+' บาท';
-    //     document.getElementById("LivingExpenses").innerHTML = 'เบี้ยเลี้ยง : '+result[0]['LivingExpenses']+' บาท';
-    //     document.getElementById("Allowance").innerHTML = 'เบี้ยเลี้ยง2 : '+result[0]['Allowance']+' บาท';
-    //     document.getElementById("AllowanceDisaster").innerHTML = 'ค่าเลี้ยงภัย : '+result[0]['AllowanceDisaster']+' บาท';
-    //     document.getElementById("AllowanceSafety").innerHTML = 'เบี้ยเลี้ยงเซตตี้ : '+result[0]['AllowanceSafety']+' บาท';
-    //     document.getElementById("SpecialAllowance").innerHTML = 'เบี้ยเลี้ยงพิเศษ : '+result[0]['SpecialAllowance']+' บาท';
-    //     document.getElementById("Bank").innerHTML = 'การรับเงิน : '+Choice;
-    //     document.getElementById("BankDetail").innerHTML = 'ธนาคาร : '+result[0]['Bank_Name'];
-    //     document.getElementById("BankDetail2").innerHTML = 'สาขา : '+result[0]['BankBranch'];
-    //     document.getElementById("BankDetail3").innerHTML = 'เลขบัญชี : '+result[0]['AccountNumber'];
-    //     document.getElementById("Social").innerHTML = 'ประกันสังคม : '+ social;
-    //     document.getElementById("InformIn").innerHTML = 'แจ้งเข้า : '+result[0]['Inform'];
-    //     document.getElementById("InformOut").innerHTML = 'แจ้งออก : '+result[0]['Notice'];
-    //     document.getElementById("Hospital").innerHTML = 'สถานพยาบาล : '+result[0]['Hos_name'];
-    // }
-
     tpoly.StartClock24 = function() {
         TheTime = new Date;
+
+        d = TheTime.getDate();
         m = TheTime.getMonth();
         y = TheTime.getFullYear();
+        h = tpoly.showFilled(TheTime.getHours());
+        i = tpoly.showFilled(TheTime.getMinutes());
+        s = tpoly.showFilled(TheTime.getSeconds());
+
         m = (parseInt(m)+1);
         y = (parseInt(y)+543);
-        document.getElementById("showTime").innerHTML = TheTime.getDate()+' / '+m+' / '+y+'  '+tpoly.showFilled(TheTime.getHours()) + ":" +
-        tpoly.showFilled(TheTime.getMinutes()) + ":" + tpoly.showFilled(TheTime.getSeconds());
-        setTimeout("tpoly.StartClock24()",1000)
+
+        document.getElementById("showTime").innerHTML = d+' / '+m+' / '+y+'  '+h+ ":" + i + ":" + s;
+        setTimeout("tpoly.StartClock24()",1000);
     }
 
     tpoly.showFilled = function(Value) {
