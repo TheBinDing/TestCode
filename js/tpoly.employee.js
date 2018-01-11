@@ -18,7 +18,7 @@ var tpoly = {
         }
     }
 
-    tpoly.employee.page = function(page) {
+    tpoly.employee.page = function() {
         p = $('#employeePage').val();
 
         id1 = $("#tab1").attr("class");
@@ -35,7 +35,7 @@ var tpoly = {
             status = 'B';
         }
 
-        tpoly.employee.loadEmployee('',p,status);
+        tpoly.employee.loadEmployee('', p, status);
     }
 
     tpoly.employee.setStatus = function(status) {
@@ -96,6 +96,7 @@ var tpoly = {
     }
 
     tpoly.employee.loadEmployee = function(obj, page, status, value) {
+        // console.log(obj+'--'+page+'--'+status+'--'+value);
         vv = obj;
         tpoly.employee.Criteria['name'] = '';
         tpoly.employee.Criteria['id'] = '';
@@ -200,7 +201,11 @@ var tpoly = {
             limitP = tpoly.employee.Criteria['page'];
 
             start = (num > 1) ? (((num - 1) * limitP) + 1) : 1;
-            end = (num > 1) ? (limitP * num) : limitP;
+            if(resultNum < 10) {
+                end = resultNum;
+            } else {
+                end = (num > 1) ? (limitP * num) : limitP;
+            }
 
             var ListPage = $('#ListPage');
             var p = 1;

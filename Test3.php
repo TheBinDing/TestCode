@@ -61,9 +61,9 @@
             <div id="showTime" style="font-size: 10px;"></div>
             <div class="ibox-content">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#" onclick="">ทำงาน</a></li>
-                    <li class=""><a href="#" onclick="">ออก</a></li>
-                    <li class=""><a href="#" onclick="">Blacklist</a></li>
+                    <li class="active" id="tab1"><a data-toggle="tab" href="#" onclick="tpoly.employee.setStatus('W');">ทำงาน</a></li>
+                    <li class="" id="tab2"><a data-toggle="tab" href="#" onclick="tpoly.employee.setStatus('O');">ออก</a></li>
+                    <li class="" id="tab3"><a data-toggle="tab" href="#" onclick="tpoly.employee.setStatus('B');">Blacklist</a></li>
                 </ul>
                 <div class="row" style="margin-top: 15px;margin-bottom: 5px;">
                     <div class="col-sm-6">
@@ -81,7 +81,7 @@
                     <div class="col-sm-6">
                         <div class="dataTables_filter">
                             <label>ค้นหา : 
-                                <input type="search" class="form-control input-sm" style="display: inline-block;width: auto;vertical-align: middle;" id="peopleEmployee" placeholder="ค้าหาพนักงาน" onChange="tpoly.employee.loadEmployee(this);">
+                                <input type="search" class="form-control input-sm" style="display: inline-block;width: auto;vertical-align: middle;" id="peopleEmployee" placeholder="ค้าหาพนักงาน" onChange="tpoly.employee.setSearch(this);">
                             </label>
                         </div>
                     </div>
