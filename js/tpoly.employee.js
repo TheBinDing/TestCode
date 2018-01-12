@@ -143,6 +143,7 @@ var tpoly = {
             html += '<table class="table table-striped table-bordered table-hover">';
             html += '<thead>';
             html += '<tr>';
+            html += '<th style="text-align: center;">#</th>';
             html += '<th style="text-align: center;">รหัสพนักงาน</th>';
             html += '<th style="text-align: center;">ชื่อ/นามสกุล</th>';
             html += '<th style="text-align: center;">โครงการ</th>';
@@ -156,6 +157,7 @@ var tpoly = {
                 s = parseInt(i);
                 m = (s+1);
                 html += '<tr>';
+                html += '<td style="text-align: center;">'+ m +'</td>';
                 html += '<td style="text-align: center;">'+resultSearch[i]['Em_ID']+'</td>';
                 html += '<td style="">'+resultSearch[i]['Fullname']+' '+resultSearch[i]['Lastname']+'</td>';
                 html += '<td style="">'+resultSearch[i]['Site_Name']+'</td>';
