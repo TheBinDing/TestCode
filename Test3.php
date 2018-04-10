@@ -52,9 +52,36 @@
 </style>
 <body>
     <div class="row">
-        <?php
-            require("Head2.php");
-        ?>
+            <nav class="navbar-default navbar-static-side" role="navigation">
+                <div class="sidebar-collapse">
+                    <ul class="nav metismenu" id="side-menu">
+                        <li>
+                            <div class="dropdown profile-element">
+                                <img src="img/1444982315.png" width="200" height="140" border="0" style="vertical-align:top;" alt="" title="">
+                            </div>
+                            <div class="logo-element">
+                                <img src="img/<?php if($pic == ''){ echo 'Thaipolycons.jpg'; }else{ echo $pic; } ?>" style="height: 40px;width: 40px;">
+                                <a href="News.php"><span class="nav-label">หน้าแรก</span></a>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="News.php"><i class="fa fa-pie-chart"></i> <span class="nav-label">หน้าแรก</span></a>
+                        </li>
+                        <li>
+                            <a href="News.php"><i class="fa fa-pie-chart"></i> <span class="nav-label">หน้าแรก</span></a>
+                        </li>
+                        <li>
+                            <a href="News.php"><i class="fa fa-pie-chart"></i> <span class="nav-label">หน้าแรก</span></a>
+                        </li>
+                        <li>
+                            <a href="News.php"><i class="fa fa-pie-chart"></i> <span class="nav-label">หน้าแรก</span></a>
+                        </li>
+                        <li>
+                            <a href="News.php"><i class="fa fa-pie-chart"></i> <span class="nav-label">หน้าแรก</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         <div id="page-wrapper" class="gray-bg">
         <?php require("MenuSite.php"); ?>
             <div class="wrapper wrapper-content animated fadeInRight ecommerce">

@@ -5,7 +5,7 @@
     // $host = "192.168.100.177"; // Run on WIFI
     $user = "sa";
     $password = "tentsql";
-    $dbname = "HRP";
+    $dbname = "IT";
     $objConncet = mssql_connect($host,$user,$password) or die("Can't connect DB");
     $objDB = mssql_select_db($dbname) or die("Can't select DB");
     $objDB = mysql_query("SET NAMES 'UTF-8'");
